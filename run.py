@@ -32,6 +32,11 @@ from PyQt5.QtWidgets import qApp
 from src.ui.MainWindow import Ui_MainWindow
 from src.ui.Theme import ThemeChooseDlg
 
+    
+__version__ = 0.1
+__author__ = "Cypherpunk Samurai"
+__author_email__ = "cypherpunksamurai@protonmail.com"
+
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -234,6 +239,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             print("no theme chosen")
             return
+        
+    def about(self):
+        self.message(f"Captioner {__version__}\n\nA Captioning tool created for image captioning. \n\n💻Authour: {__author__}\n📫Email: {__author_email__}")
 
     
     def bind_connect(self):
@@ -248,6 +256,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mnuCloseFolder.triggered.connect(self.close_folder)
         # Theme
         self.mnuTheme.triggered.connect(self.choose_theme_dialog)
+        # About
+        self.mnuAbout.triggered.connect(self.about)
         
         # ListWidget
         self.listFile.itemClicked.connect(self.list_item_select)
