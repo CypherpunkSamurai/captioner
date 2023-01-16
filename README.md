@@ -1,7 +1,8 @@
-<<<<<<< HEAD
 # Captioner
 
 A QT GUI to make captioning images easy
+
+![](redundant/screenshot.jpg)
 
 ## Installation
 
@@ -22,7 +23,3 @@ python3 run.py
 - CypherpunkSamurai
 
 - QT5
-=======
-# captioner
-A QT5 GUI to assist in captioning images
->>>>>>> 15e0ba4 (Initial commit)

@@ -224,8 +224,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             QtWidgets.QApplication.setStyle(values)
             
             # save current settings
-            with shelve.open("config") as settings:
-                settings["current_style"] = values
+            try:
+                with shelve.open("config") as settings:
+                    settings["current_style"] = values
+            except Exception as e:
+                print("cannot write current_style to shelve. ", e)
             return
 
         else:
@@ -272,7 +275,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     
     # Style
-    # if current_style: app.setStyle(current_style)
+    if current_style: app.setStyle(current_style)
     
     # Windows
     window = MainWindow()
