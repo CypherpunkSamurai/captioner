@@ -1,0 +1,1 @@
+PyInstaller --noconfirm --onedir --windowed --icon "app.ico" --name "Captioner" --log-level "INFO" --add-data "src;src/"  "run.py"
