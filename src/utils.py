@@ -9,9 +9,10 @@ def list_images(path,recursive=False):
     
     # Find Files
     results = []
-    for file in glob(os.path.join(path, "*.jpg"), recursive=recursive):
-        results.append(os.path.basename(file))
-    return results
+    file_types = ("*.jpg", "*.png")
+    for file_type in file_types:
+        results += glob(os.path.join(path, file_type), recursive=recursive)
+    return map(lambda i: os.path.basename(i), results)
 
 def change_file_ext(filepath, new_ext):
     """
