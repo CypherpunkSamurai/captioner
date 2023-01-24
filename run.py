@@ -8,7 +8,6 @@ import shelve # for settings
 from PyQt5 import QtWidgets, uic
 
 # Required
-from PyQt5.QtWidgets import qApp
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QMessageBox
 
@@ -21,6 +20,8 @@ from PyQt5.QtCore import Qt, QRectF
 # Lists
 from src import utils
 import os
+from PyQt5.QtWidgets import QListWidgetItem
+from PyQt5.QtGui import QColor
 
 
 # theme
@@ -50,6 +51,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     current_image_pixmap = None
     current_scene = None
     
+    # colors
+    colors = {
+        "green": QColor("#8dd4b2"),
+        "pink": QColor("#f09ead"),
+    }
+    
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
@@ -71,7 +78,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.current_folder = str(current_folder)
         
         # List Files
-        self.listFile.addItems(utils.list_images(self.current_folder))
+        for file in utils.list_images(self.current_folder):
+            item = QListWidgetItem(file)
+            
+            # check if caption file is present
+            filename = os.path.join(self.current_folder, file)
+            caption_path = utils.change_file_ext(filename, "txt")
+            
+            # if caption file present set green
+            if os.path.exists(caption_path) and not utils.is_empty(caption_path):
+                item.setBackground(self.colors["green"])
+            elif utils.is_empty(caption_path):
+                item.setBackground(self.colors["pink"])
+            
+            # add item
+            self.listFile.addItem(item)
 
 
     def close_folder(self):
@@ -89,8 +110,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # Status
         self.setStatusTip("Ready")
-        
-        
     
     
     def message(self, text):
@@ -183,7 +202,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.txtCaption.document().setPlainText(caption)
 
-
     def btn_save_caption_clicked(self):
         """
             Handles SaveCaption button click
@@ -196,8 +214,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # caption file
         caption_path = utils.change_file_ext(filename, "txt")
-        
         self.save_caption(caption_path, caption)
+        
+        # set the current item to green
+        if caption != "": self.listFile.currentItem().setBackground(self.colors["green"])
+        else: self.listFile.currentItem().setBackground(self.colors["pink"])
     
     def save_caption(self, filename, caption):
         """
@@ -260,7 +281,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mnuAbout.triggered.connect(self.about)
         
         # ListWidget
-        self.listFile.itemClicked.connect(self.list_item_select)
+        self.listFile.currentItemChanged.connect(self.list_item_select)
         
         # Caption Button
         self.btnSaveCaption.clicked.connect(self.btn_save_caption_clicked)

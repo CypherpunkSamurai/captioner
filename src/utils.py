@@ -25,3 +25,9 @@ def change_file_ext(filepath, new_ext):
     
     # return
     return name + new_ext
+
+def is_empty(file_path):
+    """
+        Returns true if the filesize equals to 0 bytes
+    """
+    return os.path.exists(file_path) and os.stat(file_path).st_size == 0
