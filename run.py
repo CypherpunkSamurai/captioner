@@ -23,6 +23,10 @@ import os
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor
 
+# Short Cuts
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QShortcut
 
 # theme
 from PyQt5.QtWidgets import QStyle
@@ -71,6 +75,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
             Open a project folder
         """
+        if self.current_folder:
+            self.close_folder()
+        
         # Open Folder
         current_folder = QFileDialog.getExistingDirectory(self, "Select Directory")
         
@@ -98,6 +105,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             
             # add item
             self.listFile.addItem(item)
+            
+        # enable widget
+        self.txtCaption.setEnabled(True)
+        self.listFile.setEnabled(True)
 
 
     def close_folder(self):
@@ -112,6 +123,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # btn
         self.btnSaveCaption.setEnabled(False)
+        self.txtCaption.setEnabled(False)
+        self.listFile.setEnabled(False)
         
         # Status
         self.setStatusTip("Ready")
@@ -301,7 +314,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def about(self):
         self.message(f"Captioner {__version__}\n\nA Captioning tool created for image captioning. \n\n💻Authour: {__author__}\n📫Email: {__author_email__}")
-
+    
+    
+    def caption_shortcut_1(self):
+        """
+            set's caption to list view
+        """
+        print("test")
+        self.listFile.setFocus()
+        self.listFile.setCurrentRow(self.listFile.currentRow())
+    
+    @pyqtSlot()
+    def caption_shortcut_2(self):
+        """
+            set's caption to caption text box
+        """
+        self.txtCaption.setFocus()
     
     def bind_connect(self):
         """
@@ -324,9 +352,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Caption Button
         self.btnSaveCaption.clicked.connect(self.btn_save_caption_clicked)
         
-        # Handle Arrow Key
+        # Short Cuts
+        self.cs1 = QShortcut(QKeySequence("Ctrl+Alt+Left"), self)
+        self.cs1.activated.connect(self.caption_shortcut_1)
+        self.cs2 = QShortcut(QKeySequence("Ctrl+Alt+Right"), self)
+        self.cs2.activated.connect(self.caption_shortcut_2)
         
-
 
 
 
