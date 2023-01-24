@@ -54,8 +54,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     # colors
     colors = {
         "green": QColor("#8dd4b2"),
-        "pink": QColor("#f09ead"),
+        "red": QColor("#f09ead"),
+        "yellow": QColor("#f2bc5d"),
     }
+    
+    # cache
+    cached_caption = {}
+    
     
     def __init__(self, *args, obj=None, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -89,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if os.path.exists(caption_path) and not utils.is_empty(caption_path):
                 item.setBackground(self.colors["green"])
             elif utils.is_empty(caption_path):
-                item.setBackground(self.colors["pink"])
+                item.setBackground(self.colors["red"])
             
             # add item
             self.listFile.addItem(item)
@@ -119,12 +124,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         QMessageBox.information(self, "Info", text)
     
     
-    def list_item_select(self, item):
+    def list_item_select(self, current_item, old_item):
         """
             Runs when the list item is clicked
         """
+        # list was cleared
+        if current_item is None:
+            return
+        
         # get file
-        text = item.text()
+        text = current_item.text()
         file_path = os.path.join(self.current_folder, text)
         
         # path
@@ -132,11 +141,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("file not found")
             return
         
+        # save current
+        if not self.txtCaption.document().isEmpty() and self.txtCaption.document().toPlainText() and self.txtCaption.document().isModified():
+            # cache
+            self.cached_caption[old_item.text()] = self.txtCaption.document().toPlainText()
+            self.txtCaption.clear()
+            print("caption was cached...")
+            
+            # old item color
+            old_item.setBackground(self.colors["yellow"])
+            
         self.current_image = file_path
         # load the image
         self.load_image()
         # render the new image
         self.render_scene()
+        
+        # btn
+        self.btnSaveCaption.setEnabled(True)
+        
+        # load caption if exists
+        self.load_caption()
 
     
     def load_image(self, url=None):
@@ -145,7 +170,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
         if url == None and not self.current_image == None: url=self.current_image
         else: return
-        print("selected image: " + url)
+        print("currently selected: " + url)
         
         self.img.setAlignment(Qt.AlignCenter)
         
@@ -154,11 +179,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.img_scene = QGraphicsScene()
         self.img_scene.addPixmap(self.current_image_pixmap)
         
-        # btn
-        self.btnSaveCaption.setEnabled(True)
-        
-        # load caption if exists
-        self.load_caption()
     
     def render_scene(self):
         """
@@ -186,21 +206,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def load_caption(self, filename=None):
         """
-            Load caption from txt if exits
+            Load caption from cache or txt if exits else return empty
         """
+        # clear
+        self.txtCaption.clear()
+        
+        image_filename = self.listFile.currentItem().text()
         # filename
         if filename == None:
-            filename = os.path.join(self.current_folder, self.listFile.currentItem().text())
+            filename = os.path.join(self.current_folder, image_filename)
         
         # caption file
         caption_path = utils.change_file_ext(filename, "txt")
         
         # caption
         caption = None
-        if os.path.exists(caption_path):
+        
+        # log("%i cached caption" % len(self.cached_caption))
+        
+        if image_filename in self.cached_caption:
+            caption = self.cached_caption.get(image_filename)
+        elif os.path.exists(caption_path):
             caption = self.read_caption(caption_path)
         
         self.txtCaption.document().setPlainText(caption)
+        
+        # simulate loading file
+        # change detection false positive avert
+        self.txtCaption.document().setModified(False)
+        
 
     def btn_save_caption_clicked(self):
         """
@@ -217,8 +251,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.save_caption(caption_path, caption)
         
         # set the current item to green
-        if caption != "": self.listFile.currentItem().setBackground(self.colors["green"])
-        else: self.listFile.currentItem().setBackground(self.colors["pink"])
+        if not len(caption) == 0: self.listFile.currentItem().setBackground(self.colors["green"])
+        else: self.listFile.currentItem().setBackground(self.colors["red"])
+        
+        # simulate file save
+        self.txtCaption.document().setModified(False)
+    
     
     def save_caption(self, filename, caption):
         """
@@ -285,6 +323,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # Caption Button
         self.btnSaveCaption.clicked.connect(self.btn_save_caption_clicked)
+        
+        # Handle Arrow Key
+        
 
 
 
