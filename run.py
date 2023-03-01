@@ -236,11 +236,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         caption = None
         
         # log("%i cached caption" % len(self.cached_caption))
-        
-        if image_filename in self.cached_caption:
-            caption = self.cached_caption.get(image_filename)
-        elif os.path.exists(caption_path):
+        if os.path.exists(caption_path):
             caption = self.read_caption(caption_path)
+        elif image_filename in self.cached_caption:
+            caption = self.cached_caption.get(image_filename)
+        
         
         self.txtCaption.document().setPlainText(caption)
         
@@ -253,8 +253,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
             Handles SaveCaption button click
         """
+        
         # cap
         caption = self.txtCaption.document().toPlainText()
+        
+        # save caption in cache
+        self.cached_caption[self.listFile.currentItem().text()] = caption
         
         # filename
         filename = os.path.join(self.current_folder, self.listFile.currentItem().text())
