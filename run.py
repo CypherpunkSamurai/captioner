@@ -39,7 +39,7 @@ from src.ui.MainWindow import Ui_MainWindow
 from src.ui.Theme import ThemeChooseDlg
 
     
-__version__ = 0.1
+__version__ = 0.2
 __author__ = "Cypherpunk Samurai"
 __author_email__ = "cypherpunksamurai@protonmail.com"
 
