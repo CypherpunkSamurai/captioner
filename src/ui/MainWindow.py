@@ -11,6 +11,8 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from src.completion.textbox import CompletedPlainText
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -46,7 +48,7 @@ class Ui_MainWindow(object):
         self.btnSaveCaption.setEnabled(False)
         self.btnSaveCaption.setObjectName("btnSaveCaption")
         self.gridLayout_4.addWidget(self.btnSaveCaption, 1, 0, 1, 1)
-        self.txtCaption = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.txtCaption = CompletedPlainText(self.centralwidget)
         self.txtCaption.setObjectName("txtCaption")
         self.txtCaption.setEnabled(False)
         self.gridLayout_4.addWidget(self.txtCaption, 0, 0, 1, 1)

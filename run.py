@@ -4,6 +4,7 @@
 
 
 import sys
+import logging
 import shelve # for settings
 from PyQt5 import QtWidgets, uic
 
@@ -42,7 +43,9 @@ __version__ = 0.1
 __author__ = "Cypherpunk Samurai"
 __author_email__ = "cypherpunksamurai@protonmail.com"
 
-
+logging.basicConfig(
+    level=logging.INFO
+)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     """
@@ -82,9 +85,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         current_folder = QFileDialog.getExistingDirectory(self, "Select Directory")
         
         # If not selected
-        print(current_folder)
+        logging.info(f"opening folder: {current_folder}")
         if current_folder == None or current_folder == "":
-            print("No folder was selected...")
+            logging.info("No folder was selected...")
             return
         else:
             self.current_folder = str(current_folder)
@@ -151,7 +154,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # path
         if not os.path.exists(file_path):
-            print("file not found")
+            logging.info("file not found")
             return
         
         # save current
@@ -159,7 +162,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # cache
             self.cached_caption[old_item.text()] = self.txtCaption.document().toPlainText()
             self.txtCaption.clear()
-            print("caption was cached...")
+            logging.info("caption was cached...")
             
             # old item color
             old_item.setBackground(self.colors["yellow"])
@@ -183,7 +186,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
         if url == None and not self.current_image == None: url=self.current_image
         else: return
-        print("currently selected: " + url)
+        logging.info("currently selected: " + url)
         
         self.img.setAlignment(Qt.AlignCenter)
         
@@ -282,8 +285,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         with open(filename, "w+") as file:
             file.write(caption)
         
-        print(f"[+] {filename}")
-        print("Saved caption...")
+        logging.info(f"[+] {filename}")
+        logging.info("Saved caption...")
 
     def read_caption(self, filename):
         """
@@ -309,11 +312,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 with shelve.open("config") as settings:
                     settings["current_style"] = values
             except Exception as e:
-                print("cannot write current_style to shelve. ", e)
+                logging.info("cannot write current_style to shelve. ", e)
             return
 
         else:
-            print("no theme chosen")
+            logging.info("no theme chosen")
             return
         
     def about(self):
@@ -324,7 +327,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
             set's caption to list view
         """
-        print("test")
+        logging.info("set focus to list view")
         self.listFile.setFocus()
         self.listFile.setCurrentRow(self.listFile.currentRow())
     
@@ -375,7 +378,7 @@ if __name__ == "__main__":
             with shelve.open("config") as settings:
                 if "current_style" in settings: current_style = settings["current_style"]
         except Exception as e:
-            print(e)
+            logging.exception(e)
         finally: pass
 
     # Run
