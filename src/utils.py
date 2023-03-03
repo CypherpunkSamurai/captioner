@@ -9,7 +9,7 @@ def list_images(path,recursive=False):
     
     # Find Files
     results = []
-    file_types = ("*.jpg", "*.png")
+    file_types = ("*.jpg", "*.jpeg", "*.png", "*.bmp")
     for file_type in file_types:
         results += glob(os.path.join(path, file_type), recursive=recursive)
     return map(lambda i: os.path.basename(i), results)
