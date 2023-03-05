@@ -1,6 +1,7 @@
 import os
 from glob import glob
 
+
 def list_images(path,recursive=False):
     """
         Returns a list of file paths
@@ -31,3 +32,4 @@ def is_empty(file_path):
         Returns true if the filesize equals to 0 bytes
     """
     return os.path.exists(file_path) and os.stat(file_path).st_size == 0
+

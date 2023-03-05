@@ -3,4 +3,5 @@ PyQt5-Qt5==5.15.2
 PyQt5-sip==12.11.1
 fast_autocomplete==0.9.0
 pylev
-lxml
+lxml==4.9.2
+pyqtdarktheme==2.1.0

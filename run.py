@@ -2,7 +2,6 @@
 # @license: MIT
 # A program to assist in tagging of images
 
-
 import sys
 import logging
 import shelve # for settings
@@ -36,7 +35,7 @@ from PyQt5.QtWidgets import qApp
 
 # Use MainWindow UI
 from src.ui.MainWindow import Ui_MainWindow
-from src.ui.Theme import ThemeChooseDlg
+from src.ui.Theme import ThemeChooseDlg, apply_theme
 
     
 __version__ = 0.2
@@ -304,8 +303,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         """
         dlg = ThemeChooseDlg()
         if dlg.exec_():
+            
+            # get returned value
             values = dlg.getResult()
-            QtWidgets.QApplication.setStyle(values)
+            
+            # apply theme
+            apply_theme(values)
+            
+            # property
+            QtWidgets.QApplication.instance().setProperty("current_style", values)
             
             # save current settings
             try:
@@ -367,25 +373,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         
 
 
-
 if __name__ == "__main__":
-    # check and read style
-    current_style = None
+    
+    # Run
+    app = QtWidgets.QApplication(sys.argv)
+    app.setProperty("current_style", None)
     
     # read settings
     if os.path.exists("config.dat"):
         try:
             with shelve.open("config") as settings:
-                if "current_style" in settings: current_style = settings["current_style"]
+                if "current_style" in settings: app.setProperty("current_style", settings["current_style"])
         except Exception as e:
             logging.exception(e)
         finally: pass
 
-    # Run
-    app = QtWidgets.QApplication(sys.argv)
     
-    # Style
-    if current_style: app.setStyle(current_style)
+    # current style
+    if app.property("current_style"):
+        apply_theme(app.property("current_style"))
     
     # Windows
     window = MainWindow()
